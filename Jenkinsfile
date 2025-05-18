@@ -43,7 +43,7 @@ pipeline {
             sonar-scanner \
               -Dsonar.projectKey=my-project-key \
               -Dsonar.sources=. \
-              -Dsonar.host.url=http://localhost:9000
+              -Dsonar.host.url=http://192.168.242.163:9000
           '''
         }
       }
