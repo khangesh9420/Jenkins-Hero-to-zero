@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'khangeshmatte123/conan-cmake-sonar:1.0.2'
-      args '-u root --add-host=host.docker.internal:host-gateway'
+      args '--user root -v /var/run/docker.sock:/var/run/docker.sock' // mount Docker socket to access the host's Docker daemon
     }
   }
 
