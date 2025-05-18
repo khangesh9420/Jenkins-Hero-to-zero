@@ -8,6 +8,7 @@ pipeline {
 
   environment {
     CONAN_HOME = "${WORKSPACE}/.conan2"
+    SONARQUBE_ENV = 'sonarqube-server' // match the name you gave in Jenkins config
   }
 
   stages {
@@ -19,25 +20,34 @@ pipeline {
     }
 
     stage('Build') {
-        steps {
-            dir("${env.WORKSPACE}") {
-                sh '''
-                    rm -rf build  # Ensure previous build files are removed
-                    
-                    conan profile detect --force
-                    conan install . --build=missing --output-folder=build/Release
-
-                    cmake -G "Unix Makefiles" \
-                    -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
-                    -DCMAKE_BUILD_TYPE=Release \
-                    -B build/Release -S .
-
-                    cmake --build build/Release
-                '''
-            }
+      steps {
+        dir("${env.WORKSPACE}") {
+          sh '''
+            rm -rf build
+            conan profile detect --force
+            conan install . --build=missing --output-folder=build/Release
+            cmake -G "Unix Makefiles" \
+              -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+              -DCMAKE_BUILD_TYPE=Release \
+              -B build/Release -S .
+            cmake --build build/Release
+          '''
         }
+      }
     }
 
+    stage('SonarQube Analysis') {
+      steps {
+        withSonarQubeEnv("${SONARQUBE_ENV}") {
+          sh '''
+            sonar-scanner \
+              -Dsonar.projectKey=my-project-key \
+              -Dsonar.sources=. \
+              -Dsonar.host.url=http://localhost:9000
+          '''
+        }
+      }
+    }
 
     stage('Archive') {
       steps {
