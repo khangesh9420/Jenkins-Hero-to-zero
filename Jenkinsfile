@@ -1,7 +1,7 @@
 pipeline {
   agent {
     docker {
-      image 'khangeshmatte123/jenkins-linux-agent:1.0.0'
+      image 'khangeshmatte123/conan-cmake-sonar:1.0.2 '
       args '-u root' 
     }
   }
