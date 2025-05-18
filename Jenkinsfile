@@ -19,21 +19,25 @@ pipeline {
     }
 
     stage('Build') {
-      steps {
+        steps {
             dir("${env.WORKSPACE}") {
-            sh '''
-                conan profile detect --force
-                conan install . --build=missing --output-folder=build
-                cmake -G "Unix Makefiles" \
-                  -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
-                  -DCMAKE_BUILD_TYPE=Release \
-                  -B build -S .
+                sh '''
+                    rm -rf build  # Ensure previous build files are removed
+                    
+                    conan profile detect --force
+                    conan install . --build=missing --output-folder=build/Release
 
-                cmake --build build
-            '''
+                    cmake -G "Unix Makefiles" \
+                    -DCMAKE_TOOLCHAIN_FILE=build/Release/generators/conan_toolchain.cmake \
+                    -DCMAKE_BUILD_TYPE=Release \
+                    -B build/Release -S .
+
+                    cmake --build build/Release
+                '''
             }
-       }
+        }
     }
+
 
     stage('Archive') {
       steps {
