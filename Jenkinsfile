@@ -2,7 +2,7 @@ pipeline {
   agent {
     docker {
       image 'khangeshmatte123/conan-cmake-sonar:1.0.2'
-      args '-u root' 
+      args '-u root --add-host=host.docker.internal:host-gateway'
     }
   }
 
@@ -43,7 +43,7 @@ pipeline {
             sonar-scanner \
               -Dsonar.projectKey=my-project-key \
               -Dsonar.sources=. \
-              -Dsonar.host.url=http://192.168.242.163:9000
+              -Dsonar.host.url=http://host.docker.internal:9000
           '''
         }
       }
