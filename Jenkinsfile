@@ -12,7 +12,7 @@ pipeline {
 
   stages {
     stage('Checkout') {
-      steps {
+      steps {   
         checkout scm
         sh 'ls -la'
       }
@@ -23,8 +23,12 @@ pipeline {
             dir("${env.WORKSPACE}") {
             sh '''
                 conan profile detect --force
-                conan install . --build=missing
-                cmake -G "Unix Makefiles" -DCMAKE_BUILD_TYPE=Release -B build -S .
+                conan install . --build=missing --output-folder=build
+                cmake -G "Unix Makefiles" \
+                  -DCMAKE_TOOLCHAIN_FILE=build/conan_toolchain.cmake \
+                  -DCMAKE_BUILD_TYPE=Release \
+                  -B build -S .
+
                 cmake --build build
             '''
             }
